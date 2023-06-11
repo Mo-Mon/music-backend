@@ -14,7 +14,7 @@ public class Album extends BaseEntity {
 
     private String name;
     @Lob
-    private byte[] album_art_data;
+    private byte[] albumArtData;
 
     @ManyToOne(fetch = FetchType.EAGER)
     private Artist artist;

@@ -12,12 +12,18 @@ import java.util.Date;
 @Getter
 @Setter
 public abstract class BaseEntity {
+
     @Id
     @GeneratedValue
     private Long id;
+
     private Date updateAt;
+
     private Boolean deleteFlag;
-    private String updateBy;
+
+    private Long idUpdateBy;
+
     private Date createAt;
-    private String createBy;
+
+    private Long idCreateBy;
 }

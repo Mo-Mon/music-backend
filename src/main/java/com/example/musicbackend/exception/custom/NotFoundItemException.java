@@ -1,12 +1,12 @@
 package com.example.musicbackend.exception.custom;
 
-public class AuthException extends RuntimeException{
+public class NotFoundItemException extends RuntimeException{
     /**
      * Serial number
      */
     private static final long serialVersionUID = 1L;
 
-    public AuthException(String message){
+    public NotFoundItemException(String message){
         super(message);
     }
 }

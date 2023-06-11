@@ -14,8 +14,6 @@ public class TokenServiceImpl implements TokenService {
 
     private final TokenRepository tokenRepository;
 
-    private final UserRepository userRepository;
-
     @Override
     public void saveTokenForUser(String jwtToken, User user, Boolean isRefresh){
         Token token = Token.builder()

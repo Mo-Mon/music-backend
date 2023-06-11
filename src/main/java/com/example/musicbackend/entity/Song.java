@@ -3,8 +3,6 @@ package com.example.musicbackend.entity;
 import com.example.musicbackend.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Data;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
