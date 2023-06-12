@@ -20,12 +20,13 @@ public class Artist extends BaseEntity {
     private String info;
 
     @Lob
+    @Column(length=16777215)
     private byte[] photoData;
 
-    @OneToMany(mappedBy = "artist", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "artist", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Album> albums = new ArrayList<>();
 
-    @OneToMany(mappedBy = "artist", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "artist", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Song> songs = new ArrayList<>();
 
 }

@@ -15,6 +15,7 @@ public class Song extends BaseEntity {
     private String name;
 
     @Lob
+    @Column(length=16777215)
     private byte[] data;
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -23,20 +24,16 @@ public class Song extends BaseEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     private Album album;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "SONG_GENRE",
             joinColumns = @JoinColumn(name = "SONG_ID"),
             inverseJoinColumns = @JoinColumn(name = "GENRE_ID"))
     private List<Genre> genres = new ArrayList<>();
 
-    @ManyToMany(mappedBy = "likedSongs", fetch = FetchType.LAZY)
-
+    @ManyToMany(mappedBy = "likedSongs", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<User> likedUsers = new ArrayList<>();
 
-    @ManyToMany(mappedBy = "songs", fetch = FetchType.LAZY)
-    private List<Playlist> playlists = new ArrayList<>();
-
-    @OneToMany(mappedBy = "song", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "song", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Comment> comments = new ArrayList<>();
 
 }

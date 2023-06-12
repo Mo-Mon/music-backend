@@ -34,11 +34,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String jwtToken;
         String email;
 
-        if(authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if(checkUrlPublic(request)){
             filterChain.doFilter(request, response);
             return;
         }
-        if(checkUrlPublic(request)){
+
+        if(authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }

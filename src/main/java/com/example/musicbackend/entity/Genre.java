@@ -2,22 +2,24 @@ package com.example.musicbackend.entity;
 
 import com.example.musicbackend.entity.base.BaseEntity;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
 public class Genre extends BaseEntity {
 
     private String name;
 
     @Lob
-    private byte[] photo_data;
+    @Column(length=16777215)
+    private byte[] photoData;
 
-    @ManyToMany(mappedBy = "genres", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "genres", fetch = FetchType.EAGER)
     private List<Song> songs = new ArrayList<>();
 
 }

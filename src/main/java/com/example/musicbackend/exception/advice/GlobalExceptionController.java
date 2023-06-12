@@ -18,15 +18,16 @@ public class GlobalExceptionController {
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     public ErrorMessage TodoException(Exception ex, WebRequest request) {
         String requestBody = "";
-        if (request instanceof ServletWebRequest) {
-            ServletWebRequest servletRequest = (ServletWebRequest) request;
-            HttpServletRequest httpServletRequest = servletRequest.getRequest();
-            try {
-                requestBody = httpServletRequest.getReader().lines().collect(Collectors.joining());
-            } catch (IOException e) {
-                // Xử lý IOException nếu cần thiết
-            }
-        }
+        System.out.println("lỗi "+ex.getMessage());
+//        if (request instanceof ServletWebRequest) {
+//            ServletWebRequest servletRequest = (ServletWebRequest) request;
+//            HttpServletRequest httpServletRequest = servletRequest.getRequest();
+//            try {
+//                requestBody = httpServletRequest.getReader().lines().collect(Collectors.joining());
+//            } catch (IOException e) {
+//                // Xử lý IOException nếu cần thiết
+//            }
+//        }
         String info = String.format("rất tiếc đã có lỗi xảy ra exception (%s) data web requet (%s)", ex.getMessage(),requestBody );
         return new ErrorMessage(info);
     }

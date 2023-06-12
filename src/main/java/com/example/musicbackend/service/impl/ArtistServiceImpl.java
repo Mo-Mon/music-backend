@@ -3,10 +3,13 @@ package com.example.musicbackend.service.impl;
 import com.example.musicbackend.Utils.ConvertUtil;
 import com.example.musicbackend.Utils.DBLogicUtil;
 import com.example.musicbackend.dto.ArtistDto;
+import com.example.musicbackend.dto.PlaylistDto;
+import com.example.musicbackend.dto.SongDto;
 import com.example.musicbackend.entity.Album;
 import com.example.musicbackend.entity.Artist;
 import com.example.musicbackend.entity.User;
 import com.example.musicbackend.entity.base.BaseEntity;
+import com.example.musicbackend.exception.custom.FileWrongException;
 import com.example.musicbackend.exception.custom.NotFoundItemException;
 import com.example.musicbackend.repository.AlbumRepository;
 import com.example.musicbackend.repository.ArtistRepository;
@@ -14,7 +17,9 @@ import com.example.musicbackend.service.ArtistService;
 import com.example.musicbackend.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,6 +32,21 @@ public class ArtistServiceImpl implements ArtistService {
     private final AlbumRepository albumRepository;
 
     private final UserService userService;
+
+    public List<SongDto> getSongsInArtist(){
+        // todo
+        return null;
+    }
+
+    public PlaylistDto addSongToArtist(){
+        // todo
+        return null;
+    }
+
+    public PlaylistDto deleteSongToArtist(){
+        // todo
+        return null;
+    }
 
     @Override
     public List<ArtistDto> findAllArtist(){
@@ -63,26 +83,27 @@ public class ArtistServiceImpl implements ArtistService {
     }
 
     @Override
-    public ArtistDto insertArtist(ArtistDto artistDto){
+    public ArtistDto insertArtist(ArtistDto artistDto, MultipartFile file){
         User user = userService.getCurrentUser();
-        Artist artist = getArtist(artistDto, user,false);
+        Artist artist = new Artist();
+        getArtist(artist, artistDto, user,false);
+        artist.setPhotoData(getData(file));
         artistRepository.save(artist);
         return getArtistDto(artist);
     }
 
     @Override
-    public ArtistDto updateArtist(ArtistDto artistDto){
-        if(!artistRepository.existsById(artistDto.getId())){
-            throw new NotFoundItemException("không tìm thấy artist từ artistDto có id là "+ artistDto.getId());
-        }
+    public ArtistDto updateArtist(ArtistDto artistDto, MultipartFile file){
+        Artist artist = artistRepository.findById(artistDto.getId())
+                .orElseThrow(() -> new NotFoundItemException("không tìm thấy artist từ artistDto có id là "+ artistDto.getId()));
         User user = userService.getCurrentUser();
-        Artist artist = getArtist(artistDto, user,true);
+        getArtist(artist ,artistDto , user,true);
+        artist.setPhotoData(getData(file));
         artistRepository.save(artist);
         return getArtistDto(artist);
     }
 
-    private Artist getArtist(ArtistDto artistDto, User user, boolean isUpdate) {
-        Artist artist = new Artist();
+    private void getArtist(Artist artist, ArtistDto artistDto, User user, boolean isUpdate) {
         ConvertUtil.copyProIgNull(artistDto, artist);
         List<Album> albumList = artistDto
                 .getListAlbumId()
@@ -96,7 +117,14 @@ public class ArtistServiceImpl implements ArtistService {
         }else{
             DBLogicUtil.setupCreate(artist, user);
         }
-        return artist;
+    }
+
+    private byte[] getData(MultipartFile file){
+        try {
+            return file.getBytes();
+        } catch (IOException e) {
+            throw new FileWrongException("dữ liệu file sai không lấy ra được");
+        }
     }
 
 }

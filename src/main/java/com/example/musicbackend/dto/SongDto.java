@@ -9,13 +9,16 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ArtistDto {
+public class SongDto {
 
     private Long id;
 
     private String name;
 
-    private String info;
+    private Long artistId;
 
-    private List<Long> listAlbumId;
+    private Long albumId;
+
+    private List<Long> listGenreId;
+
 }
