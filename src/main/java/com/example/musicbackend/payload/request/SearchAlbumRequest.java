@@ -1,4 +1,4 @@
-package com.example.musicbackend.dto;
+package com.example.musicbackend.payload.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,13 +7,12 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AlbumDto {
-
-    private Long id;
+public class SearchAlbumRequest {
 
     private String name;
 
-    private Long artistId;
+    private Integer pageCurrent;
 
-    private String artistName;
+    private Integer size;
+
 }

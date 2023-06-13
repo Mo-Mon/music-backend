@@ -1,19 +1,19 @@
-package com.example.musicbackend.dto;
+package com.example.musicbackend.payload.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class AlbumDto {
+@AllArgsConstructor
+public class ArtistResponse {
 
     private Long id;
 
     private String name;
 
-    private Long artistId;
+    private String info;
 
-    private String artistName;
+
 }

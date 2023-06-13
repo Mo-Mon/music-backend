@@ -2,8 +2,10 @@ package com.example.musicbackend.controller;
 
 import com.example.musicbackend.Utils.JsonLogicUtil;
 import com.example.musicbackend.dto.AlbumDto;
+import com.example.musicbackend.payload.request.SearchAlbumRequest;
 import com.example.musicbackend.service.AlbumService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +32,12 @@ public class AlbumController {
         return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(albumService.getPhotoAlbumById(id));
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<?> search(@RequestBody SearchAlbumRequest searchAlbumRequest){
+        return ResponseEntity.ok().body(albumService.search(searchAlbumRequest.getName(),
+                PageRequest.of(searchAlbumRequest.getPageCurrent(), searchAlbumRequest.getSize())));
+    }
+
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> create(@RequestParam("albumDto") String strAlbumDto, @RequestParam("file") MultipartFile file){
         AlbumDto albumDto = (AlbumDto) JsonLogicUtil.convertJsonToObject(strAlbumDto, AlbumDto.class);
@@ -42,4 +50,9 @@ public class AlbumController {
         return ResponseEntity.ok(albumService.updateAlbum(albumDto,file));
     }
 
+    @DeleteMapping(value = "/delete/{id}")
+    public ResponseEntity<?> delete(@PathVariable("id") Long id){
+        albumService.deleteAlbum(id);
+        return ResponseEntity.ok("");
+    }
 }

@@ -2,7 +2,6 @@ package com.example.musicbackend.service.impl;
 
 import com.example.musicbackend.Utils.ConvertUtil;
 import com.example.musicbackend.Utils.DBLogicUtil;
-import com.example.musicbackend.dto.ArtistDto;
 import com.example.musicbackend.dto.SongDto;
 import com.example.musicbackend.entity.*;
 import com.example.musicbackend.entity.base.BaseEntity;
@@ -33,14 +32,12 @@ public class SongServiceImpl implements SongService {
 
     private final GenreRepository genreRepository;
 
-    private final PlaylistRepository playlistRepository;
 
     @Override
     public SongDto findById(Long id) {
         Song song = songRepository.findById(id)
                 .orElseThrow(() -> new NotFoundItemException("không tìm thấy bài hát có id là "+ id));
-        SongDto songDto = getSongDto(song);
-        return songDto;
+        return getSongDto(song);
     }
 
     @Override
@@ -70,6 +67,16 @@ public class SongServiceImpl implements SongService {
         songRepository.save(song);
         return getSongDto(song);
     }
+
+    @Override
+    public void deleteSong(Long id){
+        Song song = songRepository.findById(id)
+                .orElseThrow(() -> new NotFoundItemException("không tìm thấy song từ songDto có id là "+ id));
+        User user = userService.getCurrentUser();
+        DBLogicUtil.setupDelete(song, user);
+        songRepository.save(song);
+    }
+
 
     private void getSong(Song song, SongDto songDto, User user, boolean isUpdate) {
         ConvertUtil.copyProIgNull(songDto, song);

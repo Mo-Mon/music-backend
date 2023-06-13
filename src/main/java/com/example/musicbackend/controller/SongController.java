@@ -1,7 +1,6 @@
 package com.example.musicbackend.controller;
 
 import com.example.musicbackend.Utils.JsonLogicUtil;
-import com.example.musicbackend.dto.ArtistDto;
 import com.example.musicbackend.dto.SongDto;
 import com.example.musicbackend.service.SongService;
 import lombok.RequiredArgsConstructor;
@@ -39,4 +38,9 @@ public class SongController {
         return ResponseEntity.ok(songService.updateSong(songDto, file));
     }
 
+    @DeleteMapping(value = "/delete/{id}")
+    public ResponseEntity<?> delete(@PathVariable("id") Long id){
+        songService.deleteSong(id);
+        return ResponseEntity.ok("");
+    }
 }

@@ -51,7 +51,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .lastName(request.getLastName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .roles(request.getRoles().stream().map( role -> roleRepository.findByName(role)).collect(Collectors.toSet()))
+                .roles(request.getRoles().stream().map(roleRepository::findByName).collect(Collectors.toSet()))
                 .build();
         userRepository.save(user);
         return getAuthenticationResponse(user);
@@ -71,10 +71,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
         refreshToken = authHeader.substring(7);
         email = jwtProvider.extractEmail(refreshToken);
-        User user = userRepository.findByEmail(email).orElse(null);
-        if(user != null) {
-            tokenService.revokeAllTokenByUser(user);
-        }
+        userRepository.findByEmail(email).ifPresent(tokenService::revokeAllTokenByUser);
     }
 
     @Override

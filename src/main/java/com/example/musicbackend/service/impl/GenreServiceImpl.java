@@ -2,6 +2,7 @@ package com.example.musicbackend.service.impl;
 
 import com.example.musicbackend.Utils.ConvertUtil;
 import com.example.musicbackend.Utils.DBLogicUtil;
+import com.example.musicbackend.constant.Constants;
 import com.example.musicbackend.dto.GenreDto;
 import com.example.musicbackend.entity.Genre;
 import com.example.musicbackend.entity.Song;
@@ -9,11 +10,15 @@ import com.example.musicbackend.entity.User;
 import com.example.musicbackend.entity.base.BaseEntity;
 import com.example.musicbackend.exception.custom.FileWrongException;
 import com.example.musicbackend.exception.custom.NotFoundItemException;
+import com.example.musicbackend.payload.request.SearchGenreRequest;
+import com.example.musicbackend.payload.response.GenreResponse;
 import com.example.musicbackend.repository.GenreRepository;
 import com.example.musicbackend.repository.SongRepository;
 import com.example.musicbackend.service.GenreService;
 import com.example.musicbackend.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,6 +35,20 @@ public class GenreServiceImpl implements GenreService {
     private final UserService userService;
 
     private final SongRepository songRepository;
+
+    @Override
+    public Page<GenreResponse> search(SearchGenreRequest searchGenreRequest){
+
+        if(searchGenreRequest.getSize() < 1){
+            searchGenreRequest.setSize(Constants.DEFAULT_SIZE_RECORD);
+        }
+        if(searchGenreRequest.getPageCurrent() < 0){
+            searchGenreRequest.setPageCurrent(Constants.DEFAULT_PAGE);
+        }
+
+        return genreRepository.search(searchGenreRequest.getName()
+        , PageRequest.of(searchGenreRequest.getPageCurrent(),searchGenreRequest.getSize()));
+    }
 
     @Override
     public List<GenreDto> findAllGenre(){
@@ -68,8 +87,17 @@ public class GenreServiceImpl implements GenreService {
         User user = userService.getCurrentUser();
         getGenre(genre, genreDto, user, false);
         genre.setPhotoData(getData(file));
-        Genre newGenre =genreRepository.save(genre);
+        Genre newGenre = genreRepository.save(genre);
         return getGenreDto(newGenre);
+    }
+
+    @Override
+    public void deleteGenre(Long id){
+        Genre genre = genreRepository.findById(id)
+                .orElseThrow(() -> new NotFoundItemException("không tìm thấy genre có id là "+ id));
+        User user = userService.getCurrentUser();
+        DBLogicUtil.setupDelete(genre, user);
+        genreRepository.save(genre);
     }
 
     private void getGenre(Genre genre, GenreDto genreDto, User user, boolean isUpdate) {

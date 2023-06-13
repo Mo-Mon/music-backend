@@ -8,4 +8,6 @@ public interface PlaylistService {
     PlaylistDto insertPlayList(PlaylistDto playlistDto);
 
     PlaylistDto updatePlayList(PlaylistDto playlistDto);
+
+    void deletePlaylist(Long id);
 }

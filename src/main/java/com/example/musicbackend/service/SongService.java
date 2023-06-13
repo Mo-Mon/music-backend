@@ -11,4 +11,6 @@ public interface SongService {
     SongDto insertSong(SongDto songDto, MultipartFile file);
 
     SongDto updateSong(SongDto songDto, MultipartFile file);
+
+    void deleteSong(Long id);
 }

@@ -43,6 +43,8 @@ public class PlaylistServiceImpl implements PlaylistService {
         return null;
     }
 
+
+
     @Override
     public PlaylistDto findById(Long id){
         Playlist playlist =  playlistRepository.findById(id)
@@ -74,6 +76,18 @@ public class PlaylistServiceImpl implements PlaylistService {
         getPlaylist(playlist, playlistDto, user,false);
         playlistRepository.save(playlist);
         return getPlaylistDto(playlist);
+    }
+
+    @Override
+    public void deletePlaylist(Long id){
+        Playlist playlist = playlistRepository.findById(id)
+                .orElseThrow(() -> new NotFoundItemException("không tìm thấy playlist có id là "+ id));
+        User user = userService.getCurrentUser();
+        if(playlist.getIdCreateBy() != user.getId()){
+            throw new BadRequestException("bạn không có quyền truy cập và playlist này");
+        }
+        DBLogicUtil.setupDelete(playlist, user);
+        playlistRepository.save(playlist);
     }
 
     private void getPlaylist(Playlist playlist, PlaylistDto playlistDto, User user, boolean isUpdate) {

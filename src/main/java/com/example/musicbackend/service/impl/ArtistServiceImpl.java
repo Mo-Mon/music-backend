@@ -2,8 +2,8 @@ package com.example.musicbackend.service.impl;
 
 import com.example.musicbackend.Utils.ConvertUtil;
 import com.example.musicbackend.Utils.DBLogicUtil;
+import com.example.musicbackend.constant.Constants;
 import com.example.musicbackend.dto.ArtistDto;
-import com.example.musicbackend.dto.PlaylistDto;
 import com.example.musicbackend.dto.SongDto;
 import com.example.musicbackend.entity.Album;
 import com.example.musicbackend.entity.Artist;
@@ -11,14 +11,19 @@ import com.example.musicbackend.entity.User;
 import com.example.musicbackend.entity.base.BaseEntity;
 import com.example.musicbackend.exception.custom.FileWrongException;
 import com.example.musicbackend.exception.custom.NotFoundItemException;
+import com.example.musicbackend.payload.request.SearchArtistRepuest;
+import com.example.musicbackend.payload.response.ArtistResponse;
 import com.example.musicbackend.repository.AlbumRepository;
 import com.example.musicbackend.repository.ArtistRepository;
 import com.example.musicbackend.service.ArtistService;
 import com.example.musicbackend.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.print.Pageable;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,14 +43,18 @@ public class ArtistServiceImpl implements ArtistService {
         return null;
     }
 
-    public PlaylistDto addSongToArtist(){
-        // todo
-        return null;
-    }
-
-    public PlaylistDto deleteSongToArtist(){
-        // todo
-        return null;
+    @Override
+    public Page<ArtistResponse> search(SearchArtistRepuest searchArtistRepuest){
+        if(searchArtistRepuest.getSize() < 1){
+            searchArtistRepuest.setSize(Constants.DEFAULT_SIZE_RECORD);
+        }
+        if(searchArtistRepuest.getPageCurrent() < 0){
+            searchArtistRepuest.setPageCurrent(Constants.DEFAULT_PAGE);
+        }
+        return artistRepository.search(searchArtistRepuest.getName()
+                , searchArtistRepuest.getInfo()
+                , PageRequest.of(searchArtistRepuest.getPageCurrent()
+                        ,searchArtistRepuest.getSize()));
     }
 
     @Override
@@ -101,6 +110,15 @@ public class ArtistServiceImpl implements ArtistService {
         artist.setPhotoData(getData(file));
         artistRepository.save(artist);
         return getArtistDto(artist);
+    }
+
+    @Override
+    public void deleteArtist(Long id){
+        Artist artist = artistRepository.findById(id)
+                .orElseThrow(() -> new NotFoundItemException("không tìm thấy artist có id là "+ id));
+        User user = userService.getCurrentUser();
+        DBLogicUtil.setupDelete(artist, user);
+        artistRepository.save(artist);
     }
 
     private void getArtist(Artist artist, ArtistDto artistDto, User user, boolean isUpdate) {

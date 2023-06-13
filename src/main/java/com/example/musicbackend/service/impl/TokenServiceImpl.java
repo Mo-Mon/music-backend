@@ -3,7 +3,6 @@ package com.example.musicbackend.service.impl;
 import com.example.musicbackend.entity.Token;
 import com.example.musicbackend.entity.User;
 import com.example.musicbackend.repository.TokenRepository;
-import com.example.musicbackend.repository.UserRepository;
 import com.example.musicbackend.service.TokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

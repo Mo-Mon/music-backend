@@ -2,6 +2,8 @@ package com.example.musicbackend.controller;
 
 import com.example.musicbackend.Utils.JsonLogicUtil;
 import com.example.musicbackend.dto.GenreDto;
+import com.example.musicbackend.payload.request.SearchArtistRepuest;
+import com.example.musicbackend.payload.request.SearchGenreRequest;
 import com.example.musicbackend.service.GenreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -15,6 +17,11 @@ import org.springframework.web.multipart.MultipartFile;
 public class GenreController {
 
     private final GenreService genreService;
+
+    @GetMapping("/search")
+    public ResponseEntity<?> search(@RequestBody SearchGenreRequest searchGenreRequest){
+        return ResponseEntity.ok(genreService.search(searchGenreRequest));
+    }
 
     @GetMapping("/all")
     public ResponseEntity<?> getAll(){
@@ -41,6 +48,12 @@ public class GenreController {
     public ResponseEntity<?> update(@RequestParam("genreDto") String strGenreDto, @RequestParam("file") MultipartFile file){
         GenreDto genreDto = (GenreDto) JsonLogicUtil.convertJsonToObject(strGenreDto, GenreDto.class);
         return ResponseEntity.ok(genreService.updateGenre(genreDto, file));
+    }
+
+    @DeleteMapping(value = "/delete/{id}")
+    public ResponseEntity<?> delete(@PathVariable("id") Long id){
+        genreService.deleteGenre(id);
+        return ResponseEntity.ok("");
     }
 
 }

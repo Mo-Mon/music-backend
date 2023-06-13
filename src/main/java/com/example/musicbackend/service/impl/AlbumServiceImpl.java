@@ -15,6 +15,8 @@ import com.example.musicbackend.repository.ArtistRepository;
 import com.example.musicbackend.service.AlbumService;
 import com.example.musicbackend.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -48,6 +50,11 @@ public class AlbumServiceImpl implements AlbumService {
     }
 
     @Override
+    public Page<AlbumDto> search(String name, Pageable pageable){
+        return albumRepository.search(name, pageable);
+    }
+
+    @Override
     public List<AlbumDto> findAllAlbum(){
         return albumRepository.findAll().stream()
                 .map(this::getAlbumDto)
@@ -67,6 +74,7 @@ public class AlbumServiceImpl implements AlbumService {
         Artist artist = album.getArtist();
         if(artist != null){
             albumDto.setArtistId(artist.getId());
+            albumDto.setArtistName(artist.getName());
         }
         return albumDto;
     }
@@ -97,6 +105,15 @@ public class AlbumServiceImpl implements AlbumService {
         album.setAlbumArtData(getData(file));
         albumRepository.save(album);
         return getAlbumDto(album);
+    }
+
+    @Override
+    public void deleteAlbum(Long id){
+        Album album = albumRepository.findById(id)
+                .orElseThrow(() -> new NotFoundItemException("không tìm thấy artist từ artistDto có id là "+ id));
+        User user = userService.getCurrentUser();
+        DBLogicUtil.setupDelete(album, user);
+        albumRepository.save(album);
     }
 
     private void getAlbum(Album album, AlbumDto albumDto, User user, boolean isUpdate) {

@@ -11,8 +11,7 @@ public class Comment extends BaseEntity {
 
     private String content;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    private User user;
+    private Boolean isEdited;
 
     @ManyToOne(fetch = FetchType.EAGER)
     private Song song;

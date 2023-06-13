@@ -2,8 +2,8 @@ package com.example.musicbackend.controller;
 
 import com.example.musicbackend.Utils.JsonLogicUtil;
 import com.example.musicbackend.dto.ArtistDto;
+import com.example.musicbackend.payload.request.SearchArtistRepuest;
 import com.example.musicbackend.service.ArtistService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +27,11 @@ public class ArtistController {
         return ResponseEntity.ok(artistService.findById(id));
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<?> search(@RequestBody SearchArtistRepuest searchArtistRepuest){
+        return ResponseEntity.ok(artistService.search(searchArtistRepuest));
+    }
+
     @GetMapping("/photo/{id}")
     public ResponseEntity<?> getPhotoById(@PathVariable(name = "id") Long id){
         return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(artistService.getPhotoArtistById(id));
@@ -44,6 +49,11 @@ public class ArtistController {
         return ResponseEntity.ok(artistService.updateArtist(artistDto, file));
     }
 
+    @DeleteMapping(value = "/delete/{id}")
+    public ResponseEntity<?> delete(@PathVariable("id") Long id){
+        artistService.deleteArtist(id);
+        return ResponseEntity.ok("");
+    }
 
 
 }
