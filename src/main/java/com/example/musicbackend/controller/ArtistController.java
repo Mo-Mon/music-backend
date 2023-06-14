@@ -49,6 +49,11 @@ public class ArtistController {
         return ResponseEntity.ok(artistService.updateArtist(artistDto, file));
     }
 
+    @PutMapping(value = "/updateDto")
+    public ResponseEntity<?> updateDto(@RequestBody ArtistDto artistDto){
+        return ResponseEntity.ok(artistService.updateArtist(artistDto));
+    }
+
     @DeleteMapping(value = "/delete/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") Long id){
         artistService.deleteArtist(id);

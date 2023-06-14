@@ -2,7 +2,6 @@ package com.example.musicbackend.controller;
 
 import com.example.musicbackend.Utils.JsonLogicUtil;
 import com.example.musicbackend.dto.GenreDto;
-import com.example.musicbackend.payload.request.SearchArtistRepuest;
 import com.example.musicbackend.payload.request.SearchGenreRequest;
 import com.example.musicbackend.service.GenreService;
 import lombok.RequiredArgsConstructor;
@@ -48,6 +47,11 @@ public class GenreController {
     public ResponseEntity<?> update(@RequestParam("genreDto") String strGenreDto, @RequestParam("file") MultipartFile file){
         GenreDto genreDto = (GenreDto) JsonLogicUtil.convertJsonToObject(strGenreDto, GenreDto.class);
         return ResponseEntity.ok(genreService.updateGenre(genreDto, file));
+    }
+
+    @PutMapping(value = "/updateDto")
+    public ResponseEntity<?> update(@RequestBody GenreDto genreDto){
+        return ResponseEntity.ok(genreService.updateGenre(genreDto));
     }
 
     @DeleteMapping(value = "/delete/{id}")

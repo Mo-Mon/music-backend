@@ -18,6 +18,10 @@ public class Song extends BaseEntity {
     @Column(length=16777215)
     private byte[] data;
 
+    @Lob
+    @Column(length=16777215)
+    private byte[] photo;
+
     @ManyToOne(fetch = FetchType.EAGER)
     private Artist artist;
 

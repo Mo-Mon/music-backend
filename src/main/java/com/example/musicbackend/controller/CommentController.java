@@ -3,10 +3,10 @@ package com.example.musicbackend.controller;
 import com.example.musicbackend.dto.CommentDto;
 import com.example.musicbackend.service.CommentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/comment")
@@ -16,8 +16,8 @@ public class CommentController {
     private final CommentService commentService;
 
     @GetMapping("/getCommentsBySong/{songId}")
-    public List<CommentDto> getCommentsBySong(@PathVariable("songId") Long songId){
-        return commentService.getAllCommentBySongId(songId);
+    public Page<CommentDto> getCommentsBySong(@PathVariable("songId") Long songId, @RequestParam("index") Integer index){
+        return commentService.getAllCommentBySongId(songId, index);
     }
 
     @PostMapping("/create")

@@ -1,5 +1,6 @@
 package com.example.musicbackend.config.security;
 
+import com.example.musicbackend.exception.custom.AuthException;
 import com.example.musicbackend.service.TokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -34,23 +35,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String jwtToken;
         String email;
 
-        if(checkUrlPublic(request)){
+        if (checkUrlPublic(request)) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        if(authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
         jwtToken = authHeader.substring(7);
 
-        email = jwtProvider.extractEmail(jwtToken);
 
-        if(StringUtils.hasText(email) && SecurityContextHolder.getContext().getAuthentication() == null){
-            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-            if(jwtProvider.isTokenValid(jwtToken,userDetails) && tokenService.checkExpiredAndRevokeAccessToken(jwtToken)){
+        if (jwtProvider.isTokenValid(jwtToken) && tokenService.checkExpiredAndRevokeAccessToken(jwtToken)) {
+            email = jwtProvider.extractEmail(jwtToken);
+
+            if (StringUtils.hasText(email) && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(email);
                 UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,
@@ -58,16 +60,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 );
                 token.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(token);
-            }else{
-                // Nếu access token đã hết hạn, trả về HTTP status code 401 Unauthorized
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Access token has expired");
-                return;
+                filterChain.doFilter(request, response);
             }
+        } else {
+            // Nếu access token đã hết hạn, trả về HTTP status code 401 Unauthorized xử lý ở bean access denied
+            filterChain.doFilter(request, response);
+            return;
         }
-        filterChain.doFilter(request, response);
+
     }
 
-    private Boolean checkUrlPublic(HttpServletRequest request){
+    private Boolean checkUrlPublic(HttpServletRequest request) {
         List<String> listUrl = List.of("/api/v1/auth");
         for (String url : listUrl) {
             if (request.getServletPath().contains(url)) {

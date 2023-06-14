@@ -13,6 +13,9 @@ import com.example.musicbackend.repository.SongRepository;
 import com.example.musicbackend.service.CommentService;
 import com.example.musicbackend.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,15 +32,17 @@ public class CommentServiceImpl implements CommentService {
     private final UserService userService;
 
     @Override
-    public List<CommentDto> getAllCommentBySongId(Long songId){
+    public Page<CommentDto> getAllCommentBySongId(Long songId, Integer index){
         if(songRepository.existsById(songId)){
             throw new NotFoundItemException("không tìm thấy bài hát có id là: "+songId);
         }
-
-        return commentRepository.findCommentByIdSong(songId)
+        Page<Comment> commentPage = commentRepository.findCommentByIdSong(songId, PageRequest.of(index,20));
+        List<CommentDto> commentDtoList = commentPage.getContent()
                 .stream()
                 .map(this::getCommentDto)
                 .collect(Collectors.toList());
+
+        return new PageImpl<>(commentDtoList,  PageRequest.of(index, 20) , commentPage.getTotalElements());
     }
 
     @Override

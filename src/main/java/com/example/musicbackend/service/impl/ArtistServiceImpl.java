@@ -3,10 +3,12 @@ package com.example.musicbackend.service.impl;
 import com.example.musicbackend.Utils.ConvertUtil;
 import com.example.musicbackend.Utils.DBLogicUtil;
 import com.example.musicbackend.constant.Constants;
+import com.example.musicbackend.dto.AlbumDto;
 import com.example.musicbackend.dto.ArtistDto;
 import com.example.musicbackend.dto.SongDto;
 import com.example.musicbackend.entity.Album;
 import com.example.musicbackend.entity.Artist;
+import com.example.musicbackend.entity.Song;
 import com.example.musicbackend.entity.User;
 import com.example.musicbackend.entity.base.BaseEntity;
 import com.example.musicbackend.exception.custom.FileWrongException;
@@ -15,7 +17,9 @@ import com.example.musicbackend.payload.request.SearchArtistRepuest;
 import com.example.musicbackend.payload.response.ArtistResponse;
 import com.example.musicbackend.repository.AlbumRepository;
 import com.example.musicbackend.repository.ArtistRepository;
+import com.example.musicbackend.repository.SongRepository;
 import com.example.musicbackend.service.ArtistService;
+import com.example.musicbackend.service.SongService;
 import com.example.musicbackend.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -23,7 +27,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.awt.print.Pageable;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,9 +41,40 @@ public class ArtistServiceImpl implements ArtistService {
 
     private final UserService userService;
 
-    public List<SongDto> getSongsInArtist(){
-        // todo
-        return null;
+    private final SongRepository songRepository;
+
+    private final SongService songService;
+
+    @Override
+    public List<SongDto> getSongsInArtist(Long id){
+        Artist artist = artistRepository.findById(id).orElseThrow(() -> new NotFoundItemException("không tìm thấy Album có id: "+ id) );
+        return artist.getSongs().stream().filter(song -> !song.getDeleteFlag()).map(songService::getSongDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public ArtistDto addSongToArtist(Long id, Long songId){
+        Artist artist = artistRepository.findById(id).orElseThrow(() -> new NotFoundItemException("không tìm thấy Album có id: "+ id) );
+        List<Song> songList = artist.getSongs();
+        Song song = songRepository.findById(songId).orElseThrow(() -> new NotFoundItemException("không tìm thấy bài hát có id: "+ songId) );
+        songList.add(song);
+        artist.setSongs(songList);
+        User user = userService.getCurrentUser();
+        DBLogicUtil.setupUpdate(artist,user);
+        Artist artistNew = artistRepository.save(artist);
+        return this.getArtistDto(artistNew);
+    }
+
+    @Override
+    public ArtistDto deleteSongToArtist(Long id, Long songId){
+        Artist artist = artistRepository.findById(id).orElseThrow(() -> new NotFoundItemException("không tìm thấy Album có id: "+ id) );
+        List<Song> songList = artist.getSongs().stream().filter(song -> !song.getDeleteFlag() && !song.getId().equals(songId)).collect(Collectors.toList());
+        songRepository.findById(songId)
+                .orElseThrow(() -> new NotFoundItemException("không tìm thấy bài hát có id: "+ songId) );
+        artist.setSongs(songList);
+        User user = userService.getCurrentUser();
+        DBLogicUtil.setupUpdate(artist,user);
+        Artist artistNew = artistRepository.save(artist);
+        return this.getArtistDto(artistNew);
     }
 
     @Override
@@ -119,6 +153,16 @@ public class ArtistServiceImpl implements ArtistService {
         User user = userService.getCurrentUser();
         DBLogicUtil.setupDelete(artist, user);
         artistRepository.save(artist);
+    }
+
+    @Override
+    public ArtistDto updateArtist(ArtistDto artistDto) {
+        Artist artist = artistRepository.findById(artistDto.getId())
+                .orElseThrow(() -> new NotFoundItemException("không tìm thấy artist từ artistDto có id là "+ artistDto.getId()));
+        User user = userService.getCurrentUser();
+        getArtist(artist ,artistDto , user,true);
+        artistRepository.save(artist);
+        return getArtistDto(artist);
     }
 
     private void getArtist(Artist artist, ArtistDto artistDto, User user, boolean isUpdate) {

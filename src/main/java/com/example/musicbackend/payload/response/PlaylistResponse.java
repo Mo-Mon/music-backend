@@ -5,9 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class GenreResponse {
+@AllArgsConstructor
+public class PlaylistResponse {
 
     private Long id;
 

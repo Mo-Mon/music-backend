@@ -1,6 +1,7 @@
 package com.example.musicbackend.service;
 
 import com.example.musicbackend.dto.ArtistDto;
+import com.example.musicbackend.dto.SongDto;
 import com.example.musicbackend.exception.custom.NotFoundItemException;
 import com.example.musicbackend.payload.request.SearchArtistRepuest;
 import com.example.musicbackend.payload.response.ArtistResponse;
@@ -11,6 +12,12 @@ import java.io.IOException;
 import java.util.List;
 
 public interface ArtistService {
+    List<SongDto> getSongsInArtist(Long id);
+
+    ArtistDto addSongToArtist(Long id, Long songId);
+
+    ArtistDto deleteSongToArtist(Long id, Long songId);
+
     Page<ArtistResponse> search(SearchArtistRepuest searchArtistRepuest);
 
     List<ArtistDto> findAllArtist();
@@ -24,4 +31,6 @@ public interface ArtistService {
     ArtistDto updateArtist(ArtistDto artistDto, MultipartFile file);
 
     void deleteArtist(Long id);
+
+    ArtistDto updateArtist(ArtistDto artistDto);
 }

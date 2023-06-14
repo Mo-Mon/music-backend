@@ -22,4 +22,6 @@ public interface GenreService {
     GenreDto updateGenre(GenreDto genreDto, MultipartFile file);
 
     void deleteGenre(Long id);
+
+    GenreDto updateGenre(GenreDto genreDto);
 }

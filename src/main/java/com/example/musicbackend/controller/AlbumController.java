@@ -50,6 +50,11 @@ public class AlbumController {
         return ResponseEntity.ok(albumService.updateAlbum(albumDto,file));
     }
 
+    @PutMapping(value = "/updateDto")
+    public ResponseEntity<?> updateDto(@RequestBody AlbumDto albumDto){
+        return ResponseEntity.ok(albumService.updateAlbum(albumDto));
+    }
+
     @DeleteMapping(value = "/delete/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") Long id){
         albumService.deleteAlbum(id);

@@ -1,6 +1,7 @@
 package com.example.musicbackend.service;
 
 import com.example.musicbackend.dto.AlbumDto;
+import com.example.musicbackend.dto.SongDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,5 +21,13 @@ public interface AlbumService {
 
     AlbumDto updateAlbum(AlbumDto AlbumDto, MultipartFile file);
 
+    AlbumDto updateAlbum(AlbumDto albumDto);
+
     void deleteAlbum(Long id);
+
+    List<SongDto> getSongsInAlbum(Long id);
+
+    AlbumDto addSongToAlbum(Long id, Long songId);
+
+    AlbumDto deleteSongToAlbum(Long id, Long songId);
 }

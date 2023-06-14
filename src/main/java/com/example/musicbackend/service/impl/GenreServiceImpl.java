@@ -100,6 +100,16 @@ public class GenreServiceImpl implements GenreService {
         genreRepository.save(genre);
     }
 
+    @Override
+    public GenreDto updateGenre(GenreDto genreDto) {
+        Genre genre = genreRepository.findById(genreDto.getId())
+                .orElseThrow(() -> new NotFoundItemException("không tìm thấy genre từ genreDto có id là "+ genreDto.getId()));
+        User user = userService.getCurrentUser();
+        getGenre(genre, genreDto, user, false);
+        Genre newGenre = genreRepository.save(genre);
+        return getGenreDto(newGenre);
+    }
+
     private void getGenre(Genre genre, GenreDto genreDto, User user, boolean isUpdate) {
         ConvertUtil.copyProIgNull(genreDto, genre);
         List<Song> songs = genreDto

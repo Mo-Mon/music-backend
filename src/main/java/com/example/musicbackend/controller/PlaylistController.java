@@ -1,6 +1,7 @@
 package com.example.musicbackend.controller;
 
 import com.example.musicbackend.dto.PlaylistDto;
+import com.example.musicbackend.payload.request.SearchPlaylistRequest;
 import com.example.musicbackend.service.PlaylistService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,11 @@ import org.springframework.web.bind.annotation.*;
 public class PlaylistController {
 
     private final PlaylistService playlistService;
+
+    @GetMapping("/search")
+    public ResponseEntity<?> search(@RequestBody SearchPlaylistRequest searchPlaylistRequest){
+        return ResponseEntity.ok(playlistService.search(searchPlaylistRequest));
+    }
 
     @GetMapping("/get/{id}")
     public ResponseEntity<?> findById(@PathVariable("id") Long id){

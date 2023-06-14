@@ -24,7 +24,7 @@ public class DBLogicUtil {
         baseEntity.setIdCreateBy(user.getId());
         baseEntity.setUpdateAt(now);
         baseEntity.setIdUpdateBy(user.getId());
-        baseEntity.setDeleteFlag(true);
+        baseEntity.setDeleteFlag(false);
         baseEntity.setId(null);
     }
 }

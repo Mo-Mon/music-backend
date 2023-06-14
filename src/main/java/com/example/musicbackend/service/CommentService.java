@@ -1,11 +1,13 @@
 package com.example.musicbackend.service;
 
 import com.example.musicbackend.dto.CommentDto;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
 public interface CommentService {
-    List<CommentDto> getAllCommentBySongId(Long songId);
+
+    Page<CommentDto> getAllCommentBySongId(Long songId, Integer index);
 
     CommentDto addCommentForSong(CommentDto commentDto);
 

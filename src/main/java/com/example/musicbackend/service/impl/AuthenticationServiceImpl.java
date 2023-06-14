@@ -1,8 +1,8 @@
 package com.example.musicbackend.service.impl;
 
 import com.example.musicbackend.config.security.JwtProvider;
-import com.example.musicbackend.entity.Token;
 import com.example.musicbackend.entity.User;
+import com.example.musicbackend.exception.custom.AuthException;
 import com.example.musicbackend.payload.request.AuthenticationRequest;
 import com.example.musicbackend.payload.request.RegisterUserRequest;
 import com.example.musicbackend.payload.response.AuthenticationResponse;
@@ -23,7 +23,6 @@ import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -67,7 +66,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         final String email;
         if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "refresh token not exist");
-            throw new IOException("refresh token not found");
+            throw new AuthException("refresh token not found");
         }
         refreshToken = authHeader.substring(7);
         email = jwtProvider.extractEmail(refreshToken);
@@ -95,7 +94,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         final String email;
         if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "refresh token not exist");
-            throw new IOException("refresh token not found");
+            throw new AuthException("refresh token not found");
         }
         refreshToken = authHeader.substring(7);
 
@@ -104,7 +103,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if(StringUtils.hasText(email)){
             var user = this.userRepository.findByEmail(email)
                     .orElseThrow();
-            if(jwtProvider.isTokenValid(refreshToken,user) && tokenService.checkExpiredAndRevokeRefreshToken(refreshToken)){
+            if(jwtProvider.isTokenValid(refreshToken) && tokenService.checkExpiredAndRevokeRefreshToken(refreshToken)){
                 var accessToken = jwtProvider.generateAccessToken(new HashMap<>(),user);
                 tokenService.revokeAllAccessTokenByUser(user);
                 tokenService.saveTokenForUser(accessToken, user, false);
@@ -114,11 +113,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                         .build();
             }else{
                 // Nếu access token đã hết hạn, trả về HTTP status code 401 Unauthorized
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Access token has expired");
-                throw new IOException("refresh token not found");
+                throw new AuthException("Access token has expired");
             }
         }
-        throw new IOException("refresh token not found");
+        throw new AuthException("refresh token not found");
 
     }
 

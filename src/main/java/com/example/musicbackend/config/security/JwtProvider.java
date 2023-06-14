@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.security.Key;
 import java.util.Date;
 import java.util.Map;
@@ -58,12 +59,15 @@ public class JwtProvider {
                 .compact();
     }
 
-    public Boolean isTokenValid(String jwtToken, UserDetails userDetails){
-        String email = extractEmail(jwtToken);
-        return email.equals(userDetails.getUsername()) && !isTokenExpried(jwtToken);
+    public Boolean isTokenValid(String jwtToken ) throws IOException {
+        try{
+            return !isTokenExpired(jwtToken);
+        }catch(Exception e){
+            return false;
+        }
     }
 
-    private boolean isTokenExpried(String jwtToken) {
+    private boolean isTokenExpired(String jwtToken) {
         return extractClaims(jwtToken, Claims::getExpiration).before(new Date());
     }
 
