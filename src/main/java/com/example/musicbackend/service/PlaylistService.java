@@ -3,13 +3,15 @@ package com.example.musicbackend.service;
 import com.example.musicbackend.dto.PlaylistDto;
 import com.example.musicbackend.dto.SongDto;
 import com.example.musicbackend.payload.request.SearchPlaylistRequest;
+import com.example.musicbackend.payload.request.SearchSongRequest;
 import com.example.musicbackend.payload.response.PlaylistResponse;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
 
 public interface PlaylistService {
-    List<SongDto> getSongsInPlaylist(Long id);
+
+    Page<SongDto> getSongsInPlaylist(Long id, SearchSongRequest searchSongRequest);
 
     PlaylistDto addSongToPlaylist(Long id, Long songId);
 

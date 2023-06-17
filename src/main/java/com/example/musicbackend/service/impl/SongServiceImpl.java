@@ -13,6 +13,7 @@ import com.example.musicbackend.payload.request.SearchSongRequest;
 import com.example.musicbackend.repository.*;
 import com.example.musicbackend.service.SongService;
 import com.example.musicbackend.service.UserService;
+import com.example.musicbackend.validate.ValidateSupport;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -90,6 +91,7 @@ public class SongServiceImpl implements SongService {
 
     @Override
     public SongDto insertSong(SongDto songDto, MultipartFile data, MultipartFile photo){
+        validateFile(data, photo);
         User user = userService.getCurrentUser();
         Song song = new Song();
         getSong(song, songDto, user, false);
@@ -101,11 +103,27 @@ public class SongServiceImpl implements SongService {
 
     @Override
     public SongDto updateSong(SongDto songDto, MultipartFile data, MultipartFile photo){
+        validateFile(data, photo);
         Song song = updateDataDto(songDto);
         song.setData(getData(data));
         song.setPhoto(getData(photo));
         songRepository.save(song);
         return getSongDto(song);
+    }
+
+    private void validateFile(MultipartFile data, MultipartFile photo) {
+        if(ValidateSupport.isImageFile(photo)){
+            throw new BadRequestException("data request file này phải có đuôi dạng file ảnh (\"png\",\"jpg\",\"jpeg\", \"bmp\")");
+        }
+        if(ValidateSupport.checkLength(photo)){
+            throw new BadRequestException("data request file phải có độ dài dung lượng dưới 2mb");
+        }
+        if(ValidateSupport.isMusicFile(data)){
+            throw new BadRequestException("data request file này phải có đuôi dạng file ảnh (\"png\",\"jpg\",\"jpeg\", \"bmp\")");
+        }
+        if(ValidateSupport.checkLength(data)){
+            throw new BadRequestException("data request file phải có độ dài dung lượng dưới 2mb");
+        }
     }
 
     @Override

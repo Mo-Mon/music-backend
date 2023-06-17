@@ -8,16 +8,21 @@ import com.example.musicbackend.entity.Album;
 import com.example.musicbackend.entity.Artist;
 import com.example.musicbackend.entity.Song;
 import com.example.musicbackend.entity.User;
+import com.example.musicbackend.exception.custom.BadRequestException;
 import com.example.musicbackend.exception.custom.FileWrongException;
 import com.example.musicbackend.exception.custom.NotFoundItemException;
+import com.example.musicbackend.payload.request.SearchSongRequest;
 import com.example.musicbackend.repository.AlbumRepository;
 import com.example.musicbackend.repository.ArtistRepository;
 import com.example.musicbackend.repository.SongRepository;
 import com.example.musicbackend.service.AlbumService;
 import com.example.musicbackend.service.SongService;
 import com.example.musicbackend.service.UserService;
+import com.example.musicbackend.validate.ValidateSupport;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -79,6 +84,12 @@ public class AlbumServiceImpl implements AlbumService {
 
     @Override
     public AlbumDto insertAlbum(AlbumDto albumDto, MultipartFile file){
+        if(ValidateSupport.isImageFile(file)){
+            throw new BadRequestException("data request file này phải có đuôi dạng file ảnh (\"png\",\"jpg\",\"jpeg\", \"bmp\")");
+        }
+        if(ValidateSupport.checkLength(file)){
+            throw new BadRequestException("data request file phải có độ dài dung lượng dưới 2mb");
+        }
         User user = userService.getCurrentUser();
         Album album = new Album();
         getAlbum(album, albumDto, user,false);
@@ -89,6 +100,12 @@ public class AlbumServiceImpl implements AlbumService {
 
     @Override
     public AlbumDto updateAlbum(AlbumDto albumDto, MultipartFile file){
+        if(ValidateSupport.isImageFile(file)){
+            throw new BadRequestException("data request file này phải có đuôi dạng file ảnh (\"png\",\"jpg\",\"jpeg\", \"bmp\")");
+        }
+        if(ValidateSupport.checkLength(file)){
+            throw new BadRequestException("data request file phải có độ dài dung lượng dưới 2mb");
+        }
         Album album = albumRepository.findById(albumDto.getId())
                 .orElseThrow(() -> new NotFoundItemException("không tìm thấy artist từ artistDto có id là "+ albumDto.getId()));
         User user = userService.getCurrentUser();
@@ -140,9 +157,17 @@ public class AlbumServiceImpl implements AlbumService {
     }
 
     @Override
-    public List<SongDto> getSongsInAlbum(Long id){
-        Album album = albumRepository.findById(id).orElseThrow(() -> new NotFoundItemException("không tìm thấy Album có id: "+ id) );
-        return album.getSongs().stream().filter(song -> !song.getDeleteFlag()).map(songService::getSongDto).collect(Collectors.toList());
+    public Page<SongDto> getSongsInAlbum(Long id, SearchSongRequest searchSongRequest){
+        albumRepository.findById(id).orElseThrow(() -> new NotFoundItemException("không tìm thấy Album có id: "+ id) );
+        Page<Song> pageSong = albumRepository.searchSongByAlbum(searchSongRequest.getName(),
+                searchSongRequest.getNameArtist(),
+                id,
+                searchSongRequest.getListIdGenre(),
+                PageRequest.of(searchSongRequest.getPageCurrent(), searchSongRequest.getSize()));
+        List<SongDto> songDtoList = pageSong.getContent().stream().map(songService::getSongDto).collect(Collectors.toList());
+        return new PageImpl<>(songDtoList,
+                PageRequest.of(searchSongRequest.getPageCurrent(), searchSongRequest.getSize()),
+                pageSong.getTotalPages());
     }
 
     @Override

@@ -1,8 +1,10 @@
 package com.example.musicbackend.service.impl;
 
+import com.example.musicbackend.Utils.DBLogicUtil;
 import com.example.musicbackend.config.security.JwtProvider;
 import com.example.musicbackend.entity.User;
 import com.example.musicbackend.exception.custom.AuthException;
+import com.example.musicbackend.exception.custom.BadRequestException;
 import com.example.musicbackend.payload.request.AuthenticationRequest;
 import com.example.musicbackend.payload.request.RegisterUserRequest;
 import com.example.musicbackend.payload.response.AuthenticationResponse;
@@ -44,14 +46,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public AuthenticationResponse register(RegisterUserRequest request){
+        User oldUser = userRepository.findByEmail(request.getEmail()).orElse(null);
+        if(oldUser != null){
+            throw new BadRequestException("đã tồn tại tài khoản sử dụng email này");
+        }
         var user = User
                 .builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .roles(request.getRoles().stream().map(roleRepository::findByName).collect(Collectors.toSet()))
+                .roles(request.getRoles().stream().map(name -> roleRepository.findByName(name).orElseThrow(() -> new BadRequestException("role nhập vào không tồn tại: "+ name))).collect(Collectors.toSet()))
                 .build();
+        DBLogicUtil.setupCreate(user,user);
         userRepository.save(user);
         return getAuthenticationResponse(user);
     }
@@ -61,9 +68,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             HttpServletRequest request,
             HttpServletResponse response
     ) throws IOException {
-        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         final String refreshToken;
         final String email;
+        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "refresh token not exist");
             throw new AuthException("refresh token not found");

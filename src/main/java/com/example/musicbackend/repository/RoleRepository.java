@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface RoleRepository extends JpaRepository<Role, Long> {
 
     @Query("select r from Role r  where r.name = :name and r.deleteFlag = false ")
-    Role findByName(String name);
+    Optional<Role> findByName(String name);
 
     @Query("select r from Role r  where r.id = :id and r.deleteFlag = false ")
     Optional<Role> findById(Long id);

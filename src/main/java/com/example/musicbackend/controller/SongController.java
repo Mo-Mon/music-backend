@@ -42,24 +42,24 @@ public class SongController {
         return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(songService.getPhotoSongById(id));
     }
 
-    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/admin/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> create(@RequestParam("songDto") String strSongDto, @RequestParam("data") MultipartFile data, @RequestParam("photo") MultipartFile photo){
         SongDto songDto = (SongDto) JsonLogicUtil.convertJsonToObject(strSongDto, SongDto.class);
         return ResponseEntity.ok(songService.insertSong(songDto, data, photo));
     }
 
-    @PutMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/admin/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> update(@RequestParam("songDto") String strSongDto, @RequestParam("data") MultipartFile data, @RequestParam("photo") MultipartFile photo){
         SongDto songDto = (SongDto) JsonLogicUtil.convertJsonToObject(strSongDto, SongDto.class);
         return ResponseEntity.ok(songService.updateSong(songDto, data, photo));
     }
 
-    @PutMapping(value = "/updateDto")
+    @PutMapping(value = "/admin/updateDto")
     public ResponseEntity<?> updateDto(@RequestBody SongDto songDto){
         return ResponseEntity.ok(songService.updateSong(songDto));
     }
 
-    @DeleteMapping(value = "/delete/{id}")
+    @DeleteMapping(value = "/admin/delete/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") Long id){
         songService.deleteSong(id);
         return ResponseEntity.ok("");

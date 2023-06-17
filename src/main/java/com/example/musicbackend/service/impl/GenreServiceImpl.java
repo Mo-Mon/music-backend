@@ -8,6 +8,7 @@ import com.example.musicbackend.entity.Genre;
 import com.example.musicbackend.entity.Song;
 import com.example.musicbackend.entity.User;
 import com.example.musicbackend.entity.base.BaseEntity;
+import com.example.musicbackend.exception.custom.BadRequestException;
 import com.example.musicbackend.exception.custom.FileWrongException;
 import com.example.musicbackend.exception.custom.NotFoundItemException;
 import com.example.musicbackend.payload.request.SearchGenreRequest;
@@ -16,6 +17,7 @@ import com.example.musicbackend.repository.GenreRepository;
 import com.example.musicbackend.repository.SongRepository;
 import com.example.musicbackend.service.GenreService;
 import com.example.musicbackend.service.UserService;
+import com.example.musicbackend.validate.ValidateSupport;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -72,6 +74,12 @@ public class GenreServiceImpl implements GenreService {
 
     @Override
     public GenreDto insertGenre(GenreDto genreDto, MultipartFile file){
+        if(ValidateSupport.isImageFile(file)){
+            throw new BadRequestException("data request file này phải có đuôi dạng file ảnh (\"png\",\"jpg\",\"jpeg\", \"bmp\")");
+        }
+        if(ValidateSupport.checkLength(file)){
+            throw new BadRequestException("data request file phải có độ dài dung lượng dưới 2mb");
+        }
         User user = userService.getCurrentUser();
         Genre genre = new Genre();
         getGenre(genre, genreDto, user, false);
@@ -82,6 +90,12 @@ public class GenreServiceImpl implements GenreService {
 
     @Override
     public GenreDto updateGenre(GenreDto genreDto, MultipartFile file){
+        if(ValidateSupport.isImageFile(file)){
+            throw new BadRequestException("data request file này phải có đuôi dạng file ảnh (\"png\",\"jpg\",\"jpeg\", \"bmp\")");
+        }
+        if(ValidateSupport.checkLength(file)){
+            throw new BadRequestException("data request file phải có độ dài dung lượng dưới 2mb");
+        }
         Genre genre = genreRepository.findById(genreDto.getId())
                 .orElseThrow(() -> new NotFoundItemException("không tìm thấy genre từ genreDto có id là "+ genreDto.getId()));
         User user = userService.getCurrentUser();

@@ -3,6 +3,7 @@ package com.example.musicbackend.controller;
 import com.example.musicbackend.Utils.JsonLogicUtil;
 import com.example.musicbackend.dto.ArtistDto;
 import com.example.musicbackend.payload.request.SearchArtistRepuest;
+import com.example.musicbackend.payload.request.SearchSongRequest;
 import com.example.musicbackend.service.ArtistService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -32,33 +33,47 @@ public class ArtistController {
         return ResponseEntity.ok(artistService.search(searchArtistRepuest));
     }
 
+    @PostMapping("/admin/addSongToArtist/{id}-{songId}")
+    public ResponseEntity<?> addSongToArtist(@PathVariable Long id, @PathVariable Long songId){
+        return ResponseEntity.ok(artistService.addSongToArtist(id, songId));
+    }
+
+    @DeleteMapping("/admin/deleteSongToArtist/{id}-{songId}")
+    public ResponseEntity<?> deleteSongToArtist(@PathVariable Long id, @PathVariable Long songId){
+        return ResponseEntity.ok(artistService.deleteSongToArtist(id, songId));
+    }
+
     @GetMapping("/photo/{id}")
     public ResponseEntity<?> getPhotoById(@PathVariable(name = "id") Long id){
         return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(artistService.getPhotoArtistById(id));
     }
 
-    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/admin/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> create(@RequestParam("artistDto") String strArtistDto, @RequestParam("file") MultipartFile file){
         ArtistDto artistDto = (ArtistDto) JsonLogicUtil.convertJsonToObject(strArtistDto, ArtistDto.class);
         return ResponseEntity.ok(artistService.insertArtist(artistDto, file));
     }
 
-    @PutMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/admin/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> update(@RequestParam("artistDto")String strArtistDto, @RequestParam("file") MultipartFile file){
         ArtistDto artistDto = (ArtistDto) JsonLogicUtil.convertJsonToObject(strArtistDto, ArtistDto.class);
         return ResponseEntity.ok(artistService.updateArtist(artistDto, file));
     }
 
-    @PutMapping(value = "/updateDto")
+    @PutMapping(value = "/admin/updateDto")
     public ResponseEntity<?> updateDto(@RequestBody ArtistDto artistDto){
         return ResponseEntity.ok(artistService.updateArtist(artistDto));
     }
 
-    @DeleteMapping(value = "/delete/{id}")
+    @DeleteMapping(value = "/admin/delete/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") Long id){
         artistService.deleteArtist(id);
         return ResponseEntity.ok("");
     }
 
+    @GetMapping("/getSongs/{id}")
+    public ResponseEntity<?> getSongs(@PathVariable Long id, @RequestBody SearchSongRequest searchSongRequest){
+        return ResponseEntity.ok(artistService.getSongsInArtist(id, searchSongRequest));
+    }
 
 }

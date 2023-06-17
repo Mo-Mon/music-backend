@@ -16,6 +16,11 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Configuration
@@ -36,6 +41,11 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        List<String> listUrlAdmin = new ArrayList<>();
+        listUrlAdmin.add("/api/v1/dummy/admin/**");
+        RequestMatcher[] matchers = listUrlAdmin.stream()
+                .map(AntPathRequestMatcher::new)
+                .toArray(RequestMatcher[]::new);
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth ->
@@ -51,6 +61,13 @@ public class SecurityConfiguration {
                         "/webjars/**",
                         "/swagger-ui.html")
                         .permitAll()
+                        .requestMatchers("/api/v1/dummy/admin/**",
+                                "/api/v1/artist/admin/**",
+                                "/api/v1/album/admin/**",
+                                "/api/v1/genre/admin/**",
+                                "/api/v1/song/admin/**",
+                                "/api/v1/user/admin/**")
+                        .hasAuthority("ADMIN")
                         .anyRequest()
                         .authenticated())
                 .sessionManagement(sess ->
@@ -68,5 +85,6 @@ public class SecurityConfiguration {
                 );
         return http.build();
     }
+
 
 }

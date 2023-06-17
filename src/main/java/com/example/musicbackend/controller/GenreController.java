@@ -37,24 +37,24 @@ public class GenreController {
         return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(genreService.getPhotoGenreById(id));
     }
 
-    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/admin/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> create(@RequestParam("genreDto") String strGenreDto, @RequestParam("file") MultipartFile file){
         GenreDto genreDto = (GenreDto) JsonLogicUtil.convertJsonToObject(strGenreDto, GenreDto.class);
         return ResponseEntity.ok(genreService.insertGenre(genreDto, file));
     }
 
-    @PutMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/admin/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> update(@RequestParam("genreDto") String strGenreDto, @RequestParam("file") MultipartFile file){
         GenreDto genreDto = (GenreDto) JsonLogicUtil.convertJsonToObject(strGenreDto, GenreDto.class);
         return ResponseEntity.ok(genreService.updateGenre(genreDto, file));
     }
 
-    @PutMapping(value = "/updateDto")
+    @PutMapping(value = "/admin/updateDto")
     public ResponseEntity<?> update(@RequestBody GenreDto genreDto){
         return ResponseEntity.ok(genreService.updateGenre(genreDto));
     }
 
-    @DeleteMapping(value = "/delete/{id}")
+    @DeleteMapping(value = "/admin/delete/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") Long id){
         genreService.deleteGenre(id);
         return ResponseEntity.ok("");

@@ -6,11 +6,14 @@ import com.example.musicbackend.payload.response.AuthenticationResponse;
 import com.example.musicbackend.service.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -38,12 +41,6 @@ public class AuthenticationController {
             HttpServletResponse response
     ) throws IOException {
         return ResponseEntity.ok(service.refreshToken(request, response));
-    }
-
-    @GetMapping("/show")
-    public ResponseEntity<?> show(
-    ) {
-        return ResponseEntity.ok("test link");
     }
 
     @PostMapping("/logout-all-device")

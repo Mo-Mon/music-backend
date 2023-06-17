@@ -10,6 +10,7 @@ import com.example.musicbackend.entity.base.BaseEntity;
 import com.example.musicbackend.exception.custom.BadRequestException;
 import com.example.musicbackend.exception.custom.NotFoundItemException;
 import com.example.musicbackend.payload.request.SearchPlaylistRequest;
+import com.example.musicbackend.payload.request.SearchSongRequest;
 import com.example.musicbackend.payload.response.PlaylistResponse;
 import com.example.musicbackend.repository.PlaylistRepository;
 import com.example.musicbackend.repository.SongRepository;
@@ -18,6 +19,7 @@ import com.example.musicbackend.service.SongService;
 import com.example.musicbackend.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -37,9 +39,18 @@ public class PlaylistServiceImpl implements PlaylistService {
     private final SongService songService;
 
     @Override
-    public List<SongDto> getSongsInPlaylist(Long id){
-        Playlist playlist = playlistRepository.findById(id).orElseThrow(() -> new NotFoundItemException("không tìm thấy Album có id: "+ id) );
-        return playlist.getSongs().stream().filter(song -> !song.getDeleteFlag()).map(songService::getSongDto).collect(Collectors.toList());
+    public Page<SongDto> getSongsInPlaylist(Long id, SearchSongRequest searchSongRequest){
+        playlistRepository.findById(id).orElseThrow(() -> new NotFoundItemException("không tìm thấy Album có id: "+ id) );
+        Page<Song> pageSong = playlistRepository.searchSongByPlaylist(searchSongRequest.getName(),
+                searchSongRequest.getNameArtist(),
+                searchSongRequest.getNameAlbum(),
+                id,
+                searchSongRequest.getListIdGenre(),
+                PageRequest.of(searchSongRequest.getPageCurrent(), searchSongRequest.getSize()));
+        List<SongDto> songDtoList = pageSong.getContent().stream().map(song -> songService.getSongDto(song)).collect(Collectors.toList());
+        return new PageImpl<>(songDtoList,
+                PageRequest.of(searchSongRequest.getPageCurrent(), searchSongRequest.getSize()),
+                pageSong.getTotalPages());
     }
 
     @Override

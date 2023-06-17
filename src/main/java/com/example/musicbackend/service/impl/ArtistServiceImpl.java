@@ -11,9 +11,11 @@ import com.example.musicbackend.entity.Artist;
 import com.example.musicbackend.entity.Song;
 import com.example.musicbackend.entity.User;
 import com.example.musicbackend.entity.base.BaseEntity;
+import com.example.musicbackend.exception.custom.BadRequestException;
 import com.example.musicbackend.exception.custom.FileWrongException;
 import com.example.musicbackend.exception.custom.NotFoundItemException;
 import com.example.musicbackend.payload.request.SearchArtistRepuest;
+import com.example.musicbackend.payload.request.SearchSongRequest;
 import com.example.musicbackend.payload.response.ArtistResponse;
 import com.example.musicbackend.repository.AlbumRepository;
 import com.example.musicbackend.repository.ArtistRepository;
@@ -21,8 +23,10 @@ import com.example.musicbackend.repository.SongRepository;
 import com.example.musicbackend.service.ArtistService;
 import com.example.musicbackend.service.SongService;
 import com.example.musicbackend.service.UserService;
+import com.example.musicbackend.validate.ValidateSupport;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -46,9 +50,17 @@ public class ArtistServiceImpl implements ArtistService {
     private final SongService songService;
 
     @Override
-    public List<SongDto> getSongsInArtist(Long id){
-        Artist artist = artistRepository.findById(id).orElseThrow(() -> new NotFoundItemException("không tìm thấy Album có id: "+ id) );
-        return artist.getSongs().stream().filter(song -> !song.getDeleteFlag()).map(songService::getSongDto).collect(Collectors.toList());
+    public Page<SongDto> getSongsInArtist(Long id, SearchSongRequest searchSongRequest){
+        albumRepository.findById(id).orElseThrow(() -> new NotFoundItemException("không tìm thấy Artist có id: "+ id) );
+        Page<Song> pageSong = artistRepository.searchSongByArtist(searchSongRequest.getName(),
+                searchSongRequest.getNameArtist(),
+                id,
+                searchSongRequest.getListIdGenre(),
+                PageRequest.of(searchSongRequest.getPageCurrent(), searchSongRequest.getSize()));
+        List<SongDto> songDtoList = pageSong.getContent().stream().map(song -> songService.getSongDto(song)).collect(Collectors.toList());
+        return new PageImpl<>(songDtoList,
+                PageRequest.of(searchSongRequest.getPageCurrent(), searchSongRequest.getSize()),
+                pageSong.getTotalPages());
     }
 
     @Override
@@ -127,6 +139,12 @@ public class ArtistServiceImpl implements ArtistService {
 
     @Override
     public ArtistDto insertArtist(ArtistDto artistDto, MultipartFile file){
+        if(ValidateSupport.isImageFile(file)){
+            throw new BadRequestException("data request file này phải có đuôi dạng file ảnh (\"png\",\"jpg\",\"jpeg\", \"bmp\")");
+        }
+        if(ValidateSupport.checkLength(file)){
+            throw new BadRequestException("data request file phải có độ dài dung lượng dưới 2mb");
+        }
         User user = userService.getCurrentUser();
         Artist artist = new Artist();
         getArtist(artist, artistDto, user,false);
@@ -137,6 +155,12 @@ public class ArtistServiceImpl implements ArtistService {
 
     @Override
     public ArtistDto updateArtist(ArtistDto artistDto, MultipartFile file){
+        if(ValidateSupport.isImageFile(file)){
+            throw new BadRequestException("data request file này phải có đuôi dạng file ảnh (\"png\",\"jpg\",\"jpeg\", \"bmp\")");
+        }
+        if(ValidateSupport.checkLength(file)){
+            throw new BadRequestException("data request file phải có độ dài dung lượng dưới 2mb");
+        }
         Artist artist = artistRepository.findById(artistDto.getId())
                 .orElseThrow(() -> new NotFoundItemException("không tìm thấy artist từ artistDto có id là "+ artistDto.getId()));
         User user = userService.getCurrentUser();
