@@ -2,6 +2,7 @@ package com.example.musicbackend.controller;
 
 import com.example.musicbackend.dto.CommentDto;
 import com.example.musicbackend.service.CommentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -21,12 +22,12 @@ public class CommentController {
     }
 
     @PostMapping("/create")
-    public CommentDto createComment(@RequestBody  CommentDto commentDto){
+    public CommentDto createComment(@Valid  @RequestBody  CommentDto commentDto){
         return commentService.addCommentForSong(commentDto);
     }
 
     @PutMapping("/update")
-    public CommentDto editComment(@RequestBody  CommentDto commentDto){
+    public CommentDto editComment(@Valid @RequestBody  CommentDto commentDto){
         return commentService.editCommentForSong(commentDto);
     }
 

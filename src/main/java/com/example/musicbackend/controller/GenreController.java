@@ -4,6 +4,7 @@ import com.example.musicbackend.Utils.JsonLogicUtil;
 import com.example.musicbackend.dto.GenreDto;
 import com.example.musicbackend.payload.request.SearchGenreRequest;
 import com.example.musicbackend.service.GenreService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,7 @@ public class GenreController {
     private final GenreService genreService;
 
     @GetMapping("/search")
-    public ResponseEntity<?> search(@RequestBody SearchGenreRequest searchGenreRequest){
+    public ResponseEntity<?> search(@Valid @RequestBody SearchGenreRequest searchGenreRequest){
         return ResponseEntity.ok(genreService.search(searchGenreRequest));
     }
 
@@ -39,18 +40,18 @@ public class GenreController {
 
     @PostMapping(value = "/admin/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> create(@RequestParam("genreDto") String strGenreDto, @RequestParam("file") MultipartFile file){
-        GenreDto genreDto = (GenreDto) JsonLogicUtil.convertJsonToObject(strGenreDto, GenreDto.class);
+        @Valid GenreDto genreDto = (GenreDto) JsonLogicUtil.convertJsonToObject(strGenreDto, GenreDto.class);
         return ResponseEntity.ok(genreService.insertGenre(genreDto, file));
     }
 
     @PutMapping(value = "/admin/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> update(@RequestParam("genreDto") String strGenreDto, @RequestParam("file") MultipartFile file){
-        GenreDto genreDto = (GenreDto) JsonLogicUtil.convertJsonToObject(strGenreDto, GenreDto.class);
+        @Valid GenreDto genreDto = (GenreDto) JsonLogicUtil.convertJsonToObject(strGenreDto, GenreDto.class);
         return ResponseEntity.ok(genreService.updateGenre(genreDto, file));
     }
 
     @PutMapping(value = "/admin/updateDto")
-    public ResponseEntity<?> update(@RequestBody GenreDto genreDto){
+    public ResponseEntity<?> update(@Valid @RequestBody GenreDto genreDto){
         return ResponseEntity.ok(genreService.updateGenre(genreDto));
     }
 

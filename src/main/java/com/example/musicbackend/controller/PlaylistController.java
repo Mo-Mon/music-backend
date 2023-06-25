@@ -4,6 +4,7 @@ import com.example.musicbackend.dto.PlaylistDto;
 import com.example.musicbackend.payload.request.SearchPlaylistRequest;
 import com.example.musicbackend.payload.request.SearchSongRequest;
 import com.example.musicbackend.service.PlaylistService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +28,7 @@ public class PlaylistController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<?> search(@RequestBody SearchPlaylistRequest searchPlaylistRequest){
+    public ResponseEntity<?> search(@Valid @RequestBody SearchPlaylistRequest searchPlaylistRequest){
         return ResponseEntity.ok(playlistService.search(searchPlaylistRequest));
     }
 
@@ -37,12 +38,12 @@ public class PlaylistController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> create(@RequestBody PlaylistDto playlistDto){
+    public ResponseEntity<?> create(@Valid @RequestBody PlaylistDto playlistDto){
         return ResponseEntity.ok(playlistService.insertPlayList(playlistDto));
     }
 
     @PutMapping("/update")
-    public ResponseEntity<?> update(@RequestBody PlaylistDto playlistDto){
+    public ResponseEntity<?> update(@Valid @RequestBody PlaylistDto playlistDto){
         return ResponseEntity.ok(playlistService.updatePlayList(playlistDto));
     }
 
@@ -54,7 +55,7 @@ public class PlaylistController {
     }
 
     @GetMapping("/getSongs/{id}")
-    public ResponseEntity<?> getSongs(@PathVariable Long id, @RequestBody SearchSongRequest searchSongRequest){
+    public ResponseEntity<?> getSongs(@PathVariable Long id,@Valid  @RequestBody SearchSongRequest searchSongRequest){
         return ResponseEntity.ok(playlistService.getSongsInPlaylist(id, searchSongRequest));
     }
 

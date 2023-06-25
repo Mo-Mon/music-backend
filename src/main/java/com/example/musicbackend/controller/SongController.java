@@ -4,6 +4,7 @@ import com.example.musicbackend.Utils.JsonLogicUtil;
 import com.example.musicbackend.dto.SongDto;
 import com.example.musicbackend.payload.request.SearchSongRequest;
 import com.example.musicbackend.service.SongService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,12 +19,12 @@ public class SongController {
     private final SongService songService;
 
     @GetMapping("/searchAll")
-    public ResponseEntity<?> searchAll(@RequestBody SearchSongRequest searchSongRequest){
+    public ResponseEntity<?> searchAll(@Valid @RequestBody SearchSongRequest searchSongRequest){
         return ResponseEntity.ok(songService.searchAll(searchSongRequest));
     }
 
     @GetMapping("/searchByUser")
-    public ResponseEntity<?> searchByUser(@RequestBody SearchSongRequest searchSongRequest){
+    public ResponseEntity<?> searchByUser(@Valid @RequestBody SearchSongRequest searchSongRequest){
         return ResponseEntity.ok(songService.searchByUser(searchSongRequest));
     }
 
@@ -44,18 +45,18 @@ public class SongController {
 
     @PostMapping(value = "/admin/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> create(@RequestParam("songDto") String strSongDto, @RequestParam("data") MultipartFile data, @RequestParam("photo") MultipartFile photo){
-        SongDto songDto = (SongDto) JsonLogicUtil.convertJsonToObject(strSongDto, SongDto.class);
+        @Valid SongDto songDto = (SongDto) JsonLogicUtil.convertJsonToObject(strSongDto, SongDto.class);
         return ResponseEntity.ok(songService.insertSong(songDto, data, photo));
     }
 
     @PutMapping(value = "/admin/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> update(@RequestParam("songDto") String strSongDto, @RequestParam("data") MultipartFile data, @RequestParam("photo") MultipartFile photo){
-        SongDto songDto = (SongDto) JsonLogicUtil.convertJsonToObject(strSongDto, SongDto.class);
+        @Valid SongDto songDto = (SongDto) JsonLogicUtil.convertJsonToObject(strSongDto, SongDto.class);
         return ResponseEntity.ok(songService.updateSong(songDto, data, photo));
     }
 
     @PutMapping(value = "/admin/updateDto")
-    public ResponseEntity<?> updateDto(@RequestBody SongDto songDto){
+    public ResponseEntity<?> updateDto(@Valid @RequestBody SongDto songDto){
         return ResponseEntity.ok(songService.updateSong(songDto));
     }
 

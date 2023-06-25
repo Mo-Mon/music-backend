@@ -5,6 +5,7 @@ import com.example.musicbackend.dto.AlbumDto;
 import com.example.musicbackend.payload.request.SearchAlbumRequest;
 import com.example.musicbackend.payload.request.SearchSongRequest;
 import com.example.musicbackend.service.AlbumService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
@@ -24,7 +25,7 @@ public class AlbumController {
     }
 
     @GetMapping("/getSongs/{id}")
-    public ResponseEntity<?> getSongs(@PathVariable Long id, @RequestBody SearchSongRequest searchSongRequest){
+    public ResponseEntity<?> getSongs(@PathVariable Long id, @Valid @RequestBody SearchSongRequest searchSongRequest){
         return ResponseEntity.ok(albumService.getSongsInAlbum(id, searchSongRequest));
     }
 
@@ -49,25 +50,25 @@ public class AlbumController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<?> search(@RequestBody SearchAlbumRequest searchAlbumRequest){
+    public ResponseEntity<?> search(@Valid @RequestBody SearchAlbumRequest searchAlbumRequest){
         return ResponseEntity.ok().body(albumService.search(searchAlbumRequest.getName(),
                 PageRequest.of(searchAlbumRequest.getPageCurrent(), searchAlbumRequest.getSize())));
     }
 
     @PostMapping(value = "/admin/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> create(@RequestParam("albumDto") String strAlbumDto, @RequestParam("file") MultipartFile file){
-        AlbumDto albumDto = (AlbumDto) JsonLogicUtil.convertJsonToObject(strAlbumDto, AlbumDto.class);
+        @Valid AlbumDto albumDto = (AlbumDto) JsonLogicUtil.convertJsonToObject(strAlbumDto, AlbumDto.class);
         return ResponseEntity.ok(albumService.insertAlbum(albumDto, file));
     }
 
     @PutMapping(value = "/admin/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> update(@RequestParam("albumDto") String strAlbumDto, @RequestParam("file")  MultipartFile file){
-        AlbumDto albumDto = (AlbumDto) JsonLogicUtil.convertJsonToObject(strAlbumDto, AlbumDto.class);
+        @Valid AlbumDto albumDto = (AlbumDto) JsonLogicUtil.convertJsonToObject(strAlbumDto, AlbumDto.class);
         return ResponseEntity.ok(albumService.updateAlbum(albumDto,file));
     }
 
     @PutMapping(value = "/admin/updateDto")
-    public ResponseEntity<?> updateDto(@RequestBody AlbumDto albumDto){
+    public ResponseEntity<?> updateDto(@Valid @RequestBody AlbumDto albumDto){
         return ResponseEntity.ok(albumService.updateAlbum(albumDto));
     }
 

@@ -5,6 +5,7 @@ import com.example.musicbackend.dto.ArtistDto;
 import com.example.musicbackend.payload.request.SearchArtistRepuest;
 import com.example.musicbackend.payload.request.SearchSongRequest;
 import com.example.musicbackend.service.ArtistService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,7 @@ public class ArtistController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<?> search(@RequestBody SearchArtistRepuest searchArtistRepuest){
+    public ResponseEntity<?> search(@Valid  @RequestBody SearchArtistRepuest searchArtistRepuest){
         return ResponseEntity.ok(artistService.search(searchArtistRepuest));
     }
 
@@ -50,18 +51,18 @@ public class ArtistController {
 
     @PostMapping(value = "/admin/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> create(@RequestParam("artistDto") String strArtistDto, @RequestParam("file") MultipartFile file){
-        ArtistDto artistDto = (ArtistDto) JsonLogicUtil.convertJsonToObject(strArtistDto, ArtistDto.class);
+        @Valid ArtistDto artistDto = (ArtistDto) JsonLogicUtil.convertJsonToObject(strArtistDto, ArtistDto.class);
         return ResponseEntity.ok(artistService.insertArtist(artistDto, file));
     }
 
     @PutMapping(value = "/admin/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> update(@RequestParam("artistDto")String strArtistDto, @RequestParam("file") MultipartFile file){
-        ArtistDto artistDto = (ArtistDto) JsonLogicUtil.convertJsonToObject(strArtistDto, ArtistDto.class);
+        @Valid ArtistDto artistDto = (ArtistDto) JsonLogicUtil.convertJsonToObject(strArtistDto, ArtistDto.class);
         return ResponseEntity.ok(artistService.updateArtist(artistDto, file));
     }
 
     @PutMapping(value = "/admin/updateDto")
-    public ResponseEntity<?> updateDto(@RequestBody ArtistDto artistDto){
+    public ResponseEntity<?> updateDto(@Valid @RequestBody ArtistDto artistDto){
         return ResponseEntity.ok(artistService.updateArtist(artistDto));
     }
 
@@ -72,7 +73,7 @@ public class ArtistController {
     }
 
     @GetMapping("/getSongs/{id}")
-    public ResponseEntity<?> getSongs(@PathVariable Long id, @RequestBody SearchSongRequest searchSongRequest){
+    public ResponseEntity<?> getSongs(@PathVariable Long id,@Valid @RequestBody SearchSongRequest searchSongRequest){
         return ResponseEntity.ok(artistService.getSongsInArtist(id, searchSongRequest));
     }
 
