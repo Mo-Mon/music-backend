@@ -4,6 +4,7 @@ import com.example.musicbackend.Utils.JsonLogicUtil;
 import com.example.musicbackend.dto.SongDto;
 import com.example.musicbackend.payload.request.SearchSongRequest;
 import com.example.musicbackend.service.SongService;
+import com.example.musicbackend.validate.ValidateSupport;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -17,6 +18,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class SongController {
 
     private final SongService songService;
+
+    private final ValidateSupport validateSupport;
 
     @GetMapping("/searchAll")
     public ResponseEntity<?> searchAll(@Valid @RequestBody SearchSongRequest searchSongRequest){
@@ -45,13 +48,15 @@ public class SongController {
 
     @PostMapping(value = "/admin/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> create(@RequestParam("songDto") String strSongDto, @RequestParam("data") MultipartFile data, @RequestParam("photo") MultipartFile photo){
-        @Valid SongDto songDto = (SongDto) JsonLogicUtil.convertJsonToObject(strSongDto, SongDto.class);
+        SongDto songDto = (SongDto) JsonLogicUtil.convertJsonToObject(strSongDto, SongDto.class);
+        validateSupport.check(songDto);
         return ResponseEntity.ok(songService.insertSong(songDto, data, photo));
     }
 
     @PutMapping(value = "/admin/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> update(@RequestParam("songDto") String strSongDto, @RequestParam("data") MultipartFile data, @RequestParam("photo") MultipartFile photo){
-        @Valid SongDto songDto = (SongDto) JsonLogicUtil.convertJsonToObject(strSongDto, SongDto.class);
+        SongDto songDto = (SongDto) JsonLogicUtil.convertJsonToObject(strSongDto, SongDto.class);
+        validateSupport.check(songDto);
         return ResponseEntity.ok(songService.updateSong(songDto, data, photo));
     }
 

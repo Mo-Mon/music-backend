@@ -5,6 +5,7 @@ import com.example.musicbackend.dto.AlbumDto;
 import com.example.musicbackend.payload.request.SearchAlbumRequest;
 import com.example.musicbackend.payload.request.SearchSongRequest;
 import com.example.musicbackend.service.AlbumService;
+import com.example.musicbackend.validate.ValidateSupport;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -17,7 +18,10 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/v1/album")
 @RequiredArgsConstructor
 public class AlbumController {
+
     private final AlbumService albumService;
+
+    private final ValidateSupport validateSupport;
 
     @GetMapping("/all")
     public ResponseEntity<?> getAll(){
@@ -57,13 +61,15 @@ public class AlbumController {
 
     @PostMapping(value = "/admin/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> create(@RequestParam("albumDto") String strAlbumDto, @RequestParam("file") MultipartFile file){
-        @Valid AlbumDto albumDto = (AlbumDto) JsonLogicUtil.convertJsonToObject(strAlbumDto, AlbumDto.class);
+        AlbumDto albumDto = (AlbumDto) JsonLogicUtil.convertJsonToObject(strAlbumDto, AlbumDto.class);
+        validateSupport.check(albumDto);
         return ResponseEntity.ok(albumService.insertAlbum(albumDto, file));
     }
 
     @PutMapping(value = "/admin/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> update(@RequestParam("albumDto") String strAlbumDto, @RequestParam("file")  MultipartFile file){
-        @Valid AlbumDto albumDto = (AlbumDto) JsonLogicUtil.convertJsonToObject(strAlbumDto, AlbumDto.class);
+        AlbumDto albumDto = (AlbumDto) JsonLogicUtil.convertJsonToObject(strAlbumDto, AlbumDto.class);
+        validateSupport.check(albumDto);
         return ResponseEntity.ok(albumService.updateAlbum(albumDto,file));
     }
 
@@ -75,6 +81,6 @@ public class AlbumController {
     @DeleteMapping(value = "/admin/delete/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") Long id){
         albumService.deleteAlbum(id);
-        return ResponseEntity.ok("");
+        return ResponseEntity.ok("delete success");
     }
 }

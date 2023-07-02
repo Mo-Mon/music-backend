@@ -49,6 +49,8 @@ public class ArtistServiceImpl implements ArtistService {
 
     private final SongService songService;
 
+    private final ValidateSupport validateSupport;
+
     @Override
     public Page<SongDto> getSongsInArtist(Long id, SearchSongRequest searchSongRequest){
         albumRepository.findById(id).orElseThrow(() -> new NotFoundItemException("không tìm thấy Artist có id: "+ id) );
@@ -139,10 +141,10 @@ public class ArtistServiceImpl implements ArtistService {
 
     @Override
     public ArtistDto insertArtist(ArtistDto artistDto, MultipartFile file){
-        if(ValidateSupport.isImageFile(file)){
+        if(validateSupport.isImageFile(file)){
             throw new BadRequestException("data request file này phải có đuôi dạng file ảnh (\"png\",\"jpg\",\"jpeg\", \"bmp\")");
         }
-        if(ValidateSupport.checkLength(file)){
+        if(validateSupport.checkLength(file)){
             throw new BadRequestException("data request file phải có độ dài dung lượng dưới 2mb");
         }
         User user = userService.getCurrentUser();
@@ -155,10 +157,10 @@ public class ArtistServiceImpl implements ArtistService {
 
     @Override
     public ArtistDto updateArtist(ArtistDto artistDto, MultipartFile file){
-        if(ValidateSupport.isImageFile(file)){
+        if(validateSupport.isImageFile(file)){
             throw new BadRequestException("data request file này phải có đuôi dạng file ảnh (\"png\",\"jpg\",\"jpeg\", \"bmp\")");
         }
-        if(ValidateSupport.checkLength(file)){
+        if(validateSupport.checkLength(file)){
             throw new BadRequestException("data request file phải có độ dài dung lượng dưới 2mb");
         }
         Artist artist = artistRepository.findById(artistDto.getId())

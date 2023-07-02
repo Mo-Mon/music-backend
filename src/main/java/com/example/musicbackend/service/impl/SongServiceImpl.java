@@ -38,6 +38,7 @@ public class SongServiceImpl implements SongService {
 
     private final GenreRepository genreRepository;
 
+    private final ValidateSupport validateSupport;
 
     @Override
     public Page<SongDto> searchAll(SearchSongRequest searchSongRequest){
@@ -112,16 +113,16 @@ public class SongServiceImpl implements SongService {
     }
 
     private void validateFile(MultipartFile data, MultipartFile photo) {
-        if(ValidateSupport.isImageFile(photo)){
+        if(validateSupport.isImageFile(photo)){
             throw new BadRequestException("data request file này phải có đuôi dạng file ảnh (\"png\",\"jpg\",\"jpeg\", \"bmp\")");
         }
-        if(ValidateSupport.checkLength(photo)){
+        if(validateSupport.checkLength(photo)){
             throw new BadRequestException("data request file phải có độ dài dung lượng dưới 2mb");
         }
-        if(ValidateSupport.isMusicFile(data)){
+        if(validateSupport.isMusicFile(data)){
             throw new BadRequestException("data request file này phải có đuôi dạng file ảnh (\"png\",\"jpg\",\"jpeg\", \"bmp\")");
         }
-        if(ValidateSupport.checkLength(data)){
+        if(validateSupport.checkLength(data)){
             throw new BadRequestException("data request file phải có độ dài dung lượng dưới 2mb");
         }
     }

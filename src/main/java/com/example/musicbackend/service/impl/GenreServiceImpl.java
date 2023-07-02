@@ -38,6 +38,8 @@ public class GenreServiceImpl implements GenreService {
 
     private final SongRepository songRepository;
 
+    private final ValidateSupport validateSupport;
+
     @Override
     public Page<GenreResponse> search(SearchGenreRequest searchGenreRequest){
 
@@ -74,10 +76,10 @@ public class GenreServiceImpl implements GenreService {
 
     @Override
     public GenreDto insertGenre(GenreDto genreDto, MultipartFile file){
-        if(ValidateSupport.isImageFile(file)){
+        if(validateSupport.isImageFile(file)){
             throw new BadRequestException("data request file này phải có đuôi dạng file ảnh (\"png\",\"jpg\",\"jpeg\", \"bmp\")");
         }
-        if(ValidateSupport.checkLength(file)){
+        if(validateSupport.checkLength(file)){
             throw new BadRequestException("data request file phải có độ dài dung lượng dưới 2mb");
         }
         User user = userService.getCurrentUser();
@@ -90,10 +92,10 @@ public class GenreServiceImpl implements GenreService {
 
     @Override
     public GenreDto updateGenre(GenreDto genreDto, MultipartFile file){
-        if(ValidateSupport.isImageFile(file)){
+        if(validateSupport.isImageFile(file)){
             throw new BadRequestException("data request file này phải có đuôi dạng file ảnh (\"png\",\"jpg\",\"jpeg\", \"bmp\")");
         }
-        if(ValidateSupport.checkLength(file)){
+        if(validateSupport.checkLength(file)){
             throw new BadRequestException("data request file phải có độ dài dung lượng dưới 2mb");
         }
         Genre genre = genreRepository.findById(genreDto.getId())

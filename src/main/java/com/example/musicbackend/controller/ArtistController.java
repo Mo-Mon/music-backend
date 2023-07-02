@@ -5,6 +5,7 @@ import com.example.musicbackend.dto.ArtistDto;
 import com.example.musicbackend.payload.request.SearchArtistRepuest;
 import com.example.musicbackend.payload.request.SearchSongRequest;
 import com.example.musicbackend.service.ArtistService;
+import com.example.musicbackend.validate.ValidateSupport;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -18,6 +19,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class ArtistController {
 
     private final ArtistService artistService;
+
+    private final ValidateSupport validateSupport;
 
     @GetMapping("/all")
     public ResponseEntity<?> getAll(){
@@ -51,13 +54,15 @@ public class ArtistController {
 
     @PostMapping(value = "/admin/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> create(@RequestParam("artistDto") String strArtistDto, @RequestParam("file") MultipartFile file){
-        @Valid ArtistDto artistDto = (ArtistDto) JsonLogicUtil.convertJsonToObject(strArtistDto, ArtistDto.class);
+        ArtistDto artistDto = (ArtistDto) JsonLogicUtil.convertJsonToObject(strArtistDto, ArtistDto.class);
+        validateSupport.check(artistDto);
         return ResponseEntity.ok(artistService.insertArtist(artistDto, file));
     }
 
     @PutMapping(value = "/admin/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> update(@RequestParam("artistDto")String strArtistDto, @RequestParam("file") MultipartFile file){
-        @Valid ArtistDto artistDto = (ArtistDto) JsonLogicUtil.convertJsonToObject(strArtistDto, ArtistDto.class);
+        ArtistDto artistDto = (ArtistDto) JsonLogicUtil.convertJsonToObject(strArtistDto, ArtistDto.class);
+        validateSupport.check(artistDto);
         return ResponseEntity.ok(artistService.updateArtist(artistDto, file));
     }
 
